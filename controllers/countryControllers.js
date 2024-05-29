@@ -6,7 +6,7 @@ const getAllCountries = (req, res) => {
     const sort = req.query.sort === 'true';
   
     // Construct the SQL query based on the presence of the 'sort' query parameter
-    let query = "SELECT * FROM countries";
+    let query = "SELECT * FROM user1_countries";
     if (sort) {
       // Add ORDER BY clause to sort the results alphabetically by the name column
       query += " ORDER BY name";
@@ -32,21 +32,22 @@ const getAllCountries = (req, res) => {
 
 
 const getCountryByCode = (req,res)=>{
-    const {code} = req.params;
-
+    const {id} = req.params;
+     console.log(id)
     const query = `
-      SELECT * FROM countries 
-      WHERE alpha2Code = $1 OR alpha3Code = $2
+      SELECT * FROM user1_countries 
+      WHERE alpha2_code = $1 OR alpha3_code = $2
     `;
 
-    pool.query(query, [code,code], (error, result)=>{
+    pool.query(query, [id,id], (error, result)=>{
         if(error){
             throw error
         }else{
             if (result.rows.length === 0) {
                 res.status(404).send("Country not found");
         }else{
-            res.json(result.rows[0]); 
+            res.json(result.rows);
+            
         }
     }
   });
@@ -57,20 +58,56 @@ const getCountryByCode = (req,res)=>{
 const createCountry = (req, res) => {
   
         // Extract country name from request body
-        const { name } = req.body;
+        const { country_name } = req.body;
 
         // Determine the table based on the alphabetical range of the country name
         let tableName;
-        const firstLetter = name.charAt(0).toUpperCase();
+        const abecedary = [
+            'a',
+            'b',
+            'c',
+            'd',
+            'e',
+            'f',
+            'g',
+            'h',
+            'i',
+            'j',
+            'k',
+            'l',
+            'm',
+            'n',
+            'o',
+            'p',
+            'q',
+            'r',
+            's',
+            't',
+            'u',
+            'v',
+            'w',
+            'x',
+            ' y',
+            'z',
+          ];
+        const firstLetter = country_name.charAt(0).toLowerCase();
+        
+        const indexAbc= abecedary.find((letter, index)=>{
+            if (letter===firstLetter){
+                return index
+            }
+        })
 
-        if (firstLetter >= 'A' && firstLetter <= 'G') {
-            tableName = 'countries_a_to_g';
-        } else if (firstLetter >= 'H' && firstLetter <= 'M') {
-            tableName = 'countries_h_to_m';
-        } else if (firstLetter >= 'N' && firstLetter <= 'S') {
-            tableName = 'countries_n_to_s';
-        } else if (firstLetter >= 'T' && firstLetter <= 'Z') {
-            tableName = 'countries_t_to_z';
+        if (indexAbc >= 0 && indexAbc <= 4) {
+            tableName = 'countries_a_to_e';
+        } else if (firstLetter >= 'F' && firstLetter <= 'J') {
+            tableName = 'countries_f_to_j';
+        } else if (firstLetter >= 'K' && firstLetter <= 'O') {
+            tableName = 'countries_k_to_o';
+        } else if (firstLetter >= 'P' && firstLetter <= 'T') {
+            tableName = 'countries_p_to_t';
+        } else if(firstLetter >= 'U' && firstLetter <= 'Z'){
+            tableName = 'countries_u_to_z';
         } else {
             throw new Error('Invalid country name');
         }
@@ -81,35 +118,61 @@ const createCountry = (req, res) => {
             FROM ${tableName}
             WHERE name = $1;
         `;
-        const values = [name];
-        pool.query(query, values);
+        const values = [country_name];
+        pool.query(query, values, (error, result)=>{
+            if(error){
+                throw error
+            }else{
 
-        // Extract alpha codes from the query result
+            
+ // Extract alpha codes from the query result
         const { alpha2_code, alpha3_code } = result.rows[0];
 
         // Insert the country with alpha codes into the user's table
         const insertQuery = `
-            INSERT INTO user_table (country_name, alpha2_code, alpha3_code)
+            INSERT INTO user1_countries (country_name, alpha2_code, alpha3_code)
             VALUES ($1, $2, $3)
             RETURNING *;
         `;
-        const insertValues = [name, alpha2_code, alpha3_code];
-        const insertResult =  pool.query(insertQuery, insertValues);
+        const insertValues = [country_name, alpha2_code, alpha3_code];
+        pool.query(insertQuery, insertValues,(error,result)=>{
+            if(error){
+                console.error('Error adding country to user:', error.message);
+                res.status(500).send('Error adding country to user');
+            }else{
+             // Respond with the inserted country data
+             res.status(201).json(insertResult.rows[0]);
+            }
 
-        // Respond with the inserted country data
-        res.status(201).json(insertResult.rows[0]);
-    
-        console.error('Error adding country to user:', error.message);
-        res.status(500).send('Error adding country to user');
+        });
+
+       
+        }
+});
+
+        
     
 };
 
 
 
+//DELETE COUNTRY
+ const deleteCountry =(req,res)=>{
+    const {id}=req.params;
 
-
-
-//Delete Country
+    pool.query(`DELETE FROM user1_countries WHERE id=$1 RETURNING*`,[id], (error, result)=>{
+        if(error){
+            throw error
+        }else{
+            if (result.rows.length === 0) {
+                return res.status(404).send('Country not found');
+              }else{
+                res.json(result.rows);
+              }
+        }
+    })
+    
+ }
 
 
 module.exports =  {getAllCountries, getCountryByCode, createCountry, deleteCountry} 

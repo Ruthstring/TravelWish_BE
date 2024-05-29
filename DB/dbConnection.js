@@ -4,7 +4,7 @@ let{ PGHOST, PGDATABASE, PGUSER, PGPASSWORD, } =process.env;
 
 const {Pool} = require("pg");
 
-const Pool = new Pool({
+const pool = new Pool({
     host: PGHOST,
   database: PGDATABASE,
   username: PGUSER,
