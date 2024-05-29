@@ -1,0 +1,10 @@
+const countryRoutes = require ("express").Router();
+
+const {getAllCountries, getCountryById, createCountry, deleteCountry} = require("../controllers/countryControllers");
+
+countryRoutes.get("/", getAllCountries);
+countryRoutes.get("/:id", getCountryById);
+countryRoutes.get("/", createCountry);
+countryRoutes.get("/", deleteCountry);
+
+module.exports = countryRoutes;
