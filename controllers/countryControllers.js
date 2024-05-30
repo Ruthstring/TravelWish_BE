@@ -63,50 +63,27 @@ const createCountry = (req, res) => {
         // Determine the table based on the alphabetical range of the country name
         let tableName;
         const abecedary = [
-            'a',
-            'b',
-            'c',
-            'd',
-            'e',
-            'f',
-            'g',
-            'h',
-            'i',
-            'j',
-            'k',
-            'l',
-            'm',
-            'n',
-            'o',
-            'p',
-            'q',
-            'r',
-            's',
-            't',
-            'u',
-            'v',
-            'w',
-            'x',
-            ' y',
-            'z',
-          ];
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+        ];
         const firstLetter = country_name.charAt(0).toLowerCase();
         
-        const indexAbc= abecedary.find((letter, index)=>{
-            if (letter===firstLetter){
-                return index
-            }
-        })
+        const indexAbc = abecedary.indexOf(firstLetter);
+        // const indexAbc= abecedary.find((letter, index)=>{
+        //     if (letter===firstLetter){
+        //         return index
+        //     }
+        // })
 
         if (indexAbc >= 0 && indexAbc <= 4) {
             tableName = 'countries_a_to_e';
-        } else if (firstLetter >= 'F' && firstLetter <= 'J') {
+        } else if (indexAbc >= 5 && indexAbc <= 9) {
             tableName = 'countries_f_to_j';
-        } else if (firstLetter >= 'K' && firstLetter <= 'O') {
+        } else if (indexAbc >= 10 && indexAbc <= 14) {
             tableName = 'countries_k_to_o';
-        } else if (firstLetter >= 'P' && firstLetter <= 'T') {
+        } else if (indexAbc >= 15 && indexAbc <= 20) {
             tableName = 'countries_p_to_t';
-        } else if(firstLetter >= 'U' && firstLetter <= 'Z'){
+        } else if(indexAbc >= 21){
             tableName = 'countries_u_to_z';
         } else {
             throw new Error('Invalid country name');
@@ -141,7 +118,7 @@ const createCountry = (req, res) => {
                 res.status(500).send('Error adding country to user');
             }else{
              // Respond with the inserted country data
-             res.status(201).json(insertResult.rows[0]);
+             res.status(201).json(result.rows[0]);
             }
 
         });
