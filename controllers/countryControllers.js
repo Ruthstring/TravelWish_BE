@@ -100,29 +100,48 @@ const createCountry = (req, res) => {
             if(error){
                 throw error
             }else{
+               // Extract alpha codes from the query result
+             const { alpha2_code, alpha3_code } = result.rows[0];
+             const query = `SELECT* FROM user1_countries WHERE country_name=$1`
+             pool.query(query,[country_name], (error,result)=>{
+                if (error){
+                    throw error //error in the connection
+                }else{
+              
+                    if(result.rows.length===0){
+                     
 
-            
- // Extract alpha codes from the query result
-        const { alpha2_code, alpha3_code } = result.rows[0];
+                        // Insert the country with alpha codes into the user's table
+                        const insertQuery = `
+                            INSERT INTO user1_countries (country_name, alpha2_code, alpha3_code)
+                            VALUES ($1, $2, $3)
+                            RETURNING *;
+                        `;
+                        // const insertValues = [country_name, alpha2_code, alpha3_code];
+                        pool.query(insertQuery, [country_name, alpha2_code, alpha3_code],(error,result)=>{
+                            if(error){
+                            throw error
+                                // res.status(500).send('Error adding country to user');
+                            }else{
+                            // Respond with the inserted country data
+                            res.status(201).json(result.rows[0]);
+                            console.log(result.rows[0])
+                            }
 
-        // Insert the country with alpha codes into the user's table
-        const insertQuery = `
-            INSERT INTO user1_countries (country_name, alpha2_code, alpha3_code)
-            VALUES ($1, $2, $3)
-            RETURNING *;
-        `;
-        const insertValues = [country_name, alpha2_code, alpha3_code];
-        pool.query(insertQuery, insertValues,(error,result)=>{
-            if(error){
-                console.error('Error adding country to user:', error.message);
-                res.status(500).send('Error adding country to user');
-            }else{
-             // Respond with the inserted country data
-             res.status(201).json(result.rows[0]);
-            }
+                        });
+                    }else{
+                        
+                        res.status(401).send("Country already exists"); //check401 for things that exist
+                    }
+                }
+             })
+ 
 
-        });
-
+        console.log(country_name);
+      
+        console.log(alpha2_code);
+        console.log(alpha3_code);
+        console.log( result.rows[0]);
        
         }
 });
