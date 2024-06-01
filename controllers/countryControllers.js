@@ -69,11 +69,7 @@ const createCountry = (req, res) => {
         const firstLetter = country_name.charAt(0).toLowerCase();
         
         const indexAbc = abecedary.indexOf(firstLetter);
-        // const indexAbc= abecedary.find((letter, index)=>{
-        //     if (letter===firstLetter){
-        //         return index
-        //     }
-        // })
+     
 
         if (indexAbc >= 0 && indexAbc <= 4) {
             tableName = 'countries_a_to_e';
