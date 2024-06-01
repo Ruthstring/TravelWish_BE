@@ -109,8 +109,8 @@ const createCountry = (req, res) => {
 
                         // Insert the country with alpha codes into the user's table
                         const insertQuery = `
-                            INSERT INTO user1_countries (country_name, alpha2_code, alpha3_code)
-                            VALUES ($1, $2, $3)
+                            INSERT INTO user1_countries (country_name, alpha2_code, alpha3_code, visited)
+                            VALUES ($1, $2, $3, FALSE)
                             RETURNING *;
                         `;
                         // const insertValues = [country_name, alpha2_code, alpha3_code];
@@ -166,5 +166,32 @@ const createCountry = (req, res) => {
     
  }
 
+//VISITED STATUS
 
-module.exports =  {getAllCountries, getCountryByCode, createCountry, deleteCountry} 
+const updateVisitedStatus = (req,res)=>{
+    const {id} =req.params;
+    const {visited} =req.body;
+
+    const query =`
+    UPDATE user1_countries
+    SET visited = $1
+    WHERE id = $2
+    RETURNING*;
+    `;
+
+    pool.query(query,[visited,id], (error,result)=>{
+        if(error){
+            throw error;
+        }else{
+            if(result.rows.length===0){
+                res.status(404).send("Country not found");
+            }else{
+                res.json(result.rows[0]);
+            }
+        }
+    })
+};
+
+
+
+module.exports =  {getAllCountries, getCountryByCode, createCountry, deleteCountry,updateVisitedStatus} 
