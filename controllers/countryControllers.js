@@ -58,7 +58,7 @@ const getCountryByCode = (req,res)=>{
 const createCountry = (req, res) => {
   
         // Extract country name from request body
-        const { country_name } = req.body;
+        const { country_name, visited } = req.body;
 
         // Determine the table based on the alphabetical range of the country name
         let tableName;
@@ -98,30 +98,31 @@ const createCountry = (req, res) => {
             }else{
                // Extract alpha codes from the query result
              const { alpha2_code, alpha3_code } = result.rows[0];
-             const query = `SELECT* FROM user1_countries WHERE country_name=$1`
+             const query = `SELECT * FROM user1_countries WHERE country_name=$1`
              pool.query(query,[country_name], (error,result)=>{
                 if (error){
                     throw error //error in the connection
                 }else{
               
                     if(result.rows.length===0){
-                     
+                         console.log(result.rows)
 
                         // Insert the country with alpha codes into the user's table
                         const insertQuery = `
                             INSERT INTO user1_countries (country_name, alpha2_code, alpha3_code, visited)
-                            VALUES ($1, $2, $3, FALSE)
+                            VALUES ($1, $2, $3, $4)
                             RETURNING *;
                         `;
-                        // const insertValues = [country_name, alpha2_code, alpha3_code];
-                        pool.query(insertQuery, [country_name, alpha2_code, alpha3_code],(error,result)=>{
+
+                    
+                        pool.query(insertQuery, [country_name, alpha2_code, alpha3_code, visited],(error,result)=>{
                             if(error){
                             throw error
                                 // res.status(500).send('Error adding country to user');
                             }else{
                             // Respond with the inserted country data
-                            res.status(201).json(result.rows[0]);
-                            console.log(result.rows[0])
+                             res.status(201).json(result.rows[0]);
+                            
                             }
 
                         });
