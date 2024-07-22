@@ -4,7 +4,7 @@ const app =express();
 require("dotenv").config();
 
 const countryRoutes = require("./routes/countryRoutes");
-
+const mapRoutes = require("./routes/mapRoutes")
 
 const PORT = process.env.PORT || 8000;
 
@@ -17,7 +17,7 @@ app.get("/", (req,res)=>{
 
 //Routes
 app.use("/countries", countryRoutes);
-
+app.use("/map",mapRoutes)
 
 app.listen(PORT,()=>{
     console.log(`Server listening on Port ${PORT}`)
