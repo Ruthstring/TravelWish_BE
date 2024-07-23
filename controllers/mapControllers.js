@@ -31,4 +31,15 @@ const saveColor=async(req,res)=>{
     }   
 }
 
-module.exports={saveColor,getColor}
+const clearColors = async (req, res) => {
+  try {
+    await pool.query('DELETE FROM country_colors');
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error clearing colors:', err);
+    res.status(500).json({ error: 'Failed to clear colors' });
+  }
+};
+
+
+module.exports={saveColor,getColor,clearColors}
