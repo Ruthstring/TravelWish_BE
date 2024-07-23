@@ -23,6 +23,7 @@ const saveColor=async(req,res)=>{
         ON CONFLICT (country_id)
         DO UPDATE SET color = EXCLUDED.color;
       `, [countryId, color]);
+      console.log(countryId,color);
       res.json({ success: true });
     } catch (err) {
       console.error('Error saving color:', err);
