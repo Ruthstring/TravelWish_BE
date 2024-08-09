@@ -1,6 +1,7 @@
 const {pool} = require("../DB/dbConnection");
+const cloudinary = require('cloudinary').v2;
 
-const cloudinary = require('../cloudinaryConfig');
+// const cloudinary = require('../cloudinaryConfig');
 
 // Get all countries
 const getAllCountries = (req, res) => {
